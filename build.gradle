@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+application {
+    mainClass = 'Main'
+}
+
+run {
+    standardInput = System.in
+
+    systemProperties = [
+        'file.encoding': 'UTF-8',
+        'stdin.encoding': 'UTF-8',
+        'stdout.encoding': 'UTF-8',
+        'stderr.encoding': 'UTF-8'
+    ]
+
+    enableAssertions = true
+    ignoreExitValue = true
+}
