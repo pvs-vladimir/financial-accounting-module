@@ -13,7 +13,7 @@ public class Operation {
     private final Money amount;
     private final LocalDate date;
     private final String description;
-    private final int categoryId;
+    private int categoryId;
 
     protected Operation(OperationType type, int bankAccountId, Money amount,
                         LocalDate date, String description, int categoryId) {
@@ -33,6 +33,10 @@ public class Operation {
     public LocalDate getDate() { return date; }
     public String getDescription() { return description; }
     public int getCategoryId() { return categoryId; }
+
+    public void recategorize(int categoryId) {
+        this.categoryId = categoryId;
+    }
 
     @Override
     public String toString() {

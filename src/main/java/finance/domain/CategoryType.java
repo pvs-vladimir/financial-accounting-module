@@ -2,7 +2,9 @@ package finance.domain;
 
 public enum CategoryType {
     INCOME("ДОХОД"),
-    EXPENSE("РАСХОД");
+    EXPENSE("РАСХОД"),
+    OTHER_INCOME("ПРОЧИЕ ДОХОДЫ"),
+    OTHER_EXPENSE("ПРОЧИЕ РАСХОДЫ");
 
     private final String showType;
 

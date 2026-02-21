@@ -6,17 +6,24 @@ import java.util.Map;
 import finance.domain.BankAccount;
 import finance.domain.Category;
 import finance.domain.Operation;
+import finance.services.repository.Repository;
+import finance.services.repository.RepositoryManipulator;
 
 public class Manager {
     private final Map<ServiceType, Service> services = new HashMap<>();
-    private final Repository repository;
+    private final RepositoryManipulator repositoryManipulator;
+    private Action lastAction;
+    private Integer changedItemId;
 
-    public Manager(Repository repository) {
-        this.repository = repository;
+    public Manager(Repository repository, RepositoryManipulator manipulator) {
+        this.repositoryManipulator = manipulator;
+        this.lastAction = Action.NONE;
+        this.changedItemId = null;
     }
 
     public Map<ServiceType, Service> getAllServices() { return services; }
-    public Repository getRepository() { return repository; }
+    public Action getLastAction() { return lastAction; }
+    public Integer getChangedItemId() { return changedItemId; }
 
     public void addService(Service service) {
         if ((service != null) && (!services.containsKey(service.getType()))) {
@@ -35,57 +42,56 @@ public class Manager {
     }
 
     public void addAccount(BankAccount account) {
-        if (!repository.hasAccount(account.getId())) {
-            repository.addAccount(account);
+        if (repositoryManipulator.addAccount(account)) {
+            lastAction = Action.ADD_ACCOUNT;
+            changedItemId = account.getId();
+            notifyAllServices();
         }
     }
 
     public void removeAccount(int accountId) {
-        if (repository.hasAccount(accountId)) {
-            repository.removeCategory(accountId);
+        if (repositoryManipulator.removeAccount(accountId)) {
+            lastAction = Action.REMOVE_ACCOUNT;
+            changedItemId = accountId;
+            notifyAllServices();
         }
     }
 
     public void addCategory(Category category) {
-        if (!repository.hasCategory(category.getId())) {
-            repository.addCategory(category);
-            notifyService(ServiceType.ANALYTIC);
+        if (repositoryManipulator.addCategory(category)) {
+            lastAction = Action.ADD_CATEGORY;
+            changedItemId = category.getId();
+            notifyAllServices();
         }
     }
 
     public void removeCategory(int categoryId) {
-        if (repository.hasCategory(categoryId)) {
-            repository.removeCategory(categoryId);
-            notifyService(ServiceType.ANALYTIC);
+        if (repositoryManipulator.removeCategory(categoryId)) {
+            lastAction = Action.REMOVE_CATEGORY;
+            changedItemId = categoryId;
+            notifyAllServices();
         }
     }
 
     public void addOperation(Operation operation) {
-        if (!repository.hasOperation(operation.getId())) {
-            repository.addOperation(operation);
-            if (isActiveService(ServiceType.BANK_ACCOUNT)) {
-                BankAccountService accountService = (BankAccountService) services.get(ServiceType.BANK_ACCOUNT);
-                accountService.markNewOperation(operation.getId());
-            }
+        if (repositoryManipulator.addOperation(operation)) {
+            lastAction = Action.ADD_OPERATION;
+            changedItemId = operation.getId();
             notifyAllServices();
         }
     }
 
     public void removeOperation(int operationId) {
-        if (repository.hasOperation(operationId)) {
-            repository.removeOperation(operationId);
+        if (repositoryManipulator.removeOperation(operationId)) {
+            lastAction = Action.REMOVE_OPERATION;
+            changedItemId = operationId;
+            notifyAllServices();
         }
     }
 
     private void notifyAllServices() {
         for (Service service : services.values()) {
-            service.update();
-        }
-    }
-
-    private void notifyService(ServiceType type) {
-        if (isActiveService(type)) {
-            services.get(type).update();
+            service.update(this);
         }
     }
 }

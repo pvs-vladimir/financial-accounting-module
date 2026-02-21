@@ -4,33 +4,31 @@ import finance.common.Money;
 import finance.domain.BankAccount;
 import finance.domain.Operation;
 import finance.domain.OperationType;
+import finance.services.repository.Repository;
 import finance.services.tasks.AutoUpdateTask;
 import finance.services.tasks.BankAccountTask;
 
 public class BankAccountService extends Service {
     private final Repository repository;
-    private Integer newOperationId;
     private Money totalBalance;
 
     public BankAccountService(ServiceType type, Repository repository) {
         super(type);
         this.repository = repository;
         this.totalBalance = Money.Zero();
-        this.newOperationId = null;
     }
 
     public Money getTotalBalance() { return totalBalance; }
 
-    public void markNewOperation(int operationId) {
-        newOperationId = operationId;
-    }
-
     @Override
-    public void update() {
+    public void update(Manager manager) {
         if (!tasks.isEmpty()) {
             if (tasks.contains(BankAccountTask.BALANCE)) {
-                updateBalanceWithOperation(newOperationId);
-                newOperationId = null;
+                if (manager.getLastAction() == Action.ADD_OPERATION) {
+                    updateBalanceWithOperation(manager.getChangedItemId());
+                } else if (manager.getLastAction() == Action.REMOVE_OPERATION) {
+                    reCalculateBalance();
+                }
             }
         }
     }
@@ -50,7 +48,7 @@ public class BankAccountService extends Service {
     private void updateBalanceWithOperation(Integer operationId) {
         if (operationId == null) return;
 
-        Operation operation = repository.getOperation(newOperationId);
+        Operation operation = repository.getOperation(operationId);
         BankAccount account = repository.getAccount(operation.getBankAccountId());
         if (operation.getType() == OperationType.INCOME) {
             account.deposit(operation.getAmount());

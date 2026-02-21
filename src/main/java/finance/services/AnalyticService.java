@@ -13,6 +13,7 @@ import finance.domain.Category;
 import finance.domain.CategoryType;
 import finance.domain.Operation;
 import finance.domain.OperationType;
+import finance.services.repository.Repository;
 import finance.services.tasks.AnalyticTask;
 import finance.services.tasks.AutoUpdateTask;
 
@@ -103,7 +104,7 @@ public class AnalyticService extends Service {
     }
 
     @Override
-    public void update() {
+    public void update(Manager manager) {
         if (!tasks.isEmpty()) {
             updateOperationsForPeriod();
 
@@ -133,7 +134,7 @@ public class AnalyticService extends Service {
         MoneyFlows result = new MoneyFlows(incomeForPeriod, expenseForPeriod, profitForPeriod);
 
         setCalculationPeriod(savedPeriod);
-        update();
+        update(null);
 
         return result;
     }
@@ -149,7 +150,7 @@ public class AnalyticService extends Service {
         Map<Integer, Money> result = incomeForPeriodByCategory;
 
         setCalculationPeriod(savedPeriod);
-        update();
+        update(null);
 
         return result;
     }
@@ -165,7 +166,7 @@ public class AnalyticService extends Service {
         Map<Integer, Money> result = expenseForPeriodByCategory;
 
         setCalculationPeriod(savedPeriod);
-        update();
+        update(null);
 
         return result;
     }

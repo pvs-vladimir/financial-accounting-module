@@ -32,7 +32,7 @@ public abstract class Service {
         }
     }
 
-    public abstract void update();
+    public abstract void update(Manager manager);
 
     protected abstract boolean isSuitableTask(AutoUpdateTask task);
 }

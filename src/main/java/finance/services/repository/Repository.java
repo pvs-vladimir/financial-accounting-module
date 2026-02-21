@@ -1,11 +1,15 @@
-package finance.services;
+package finance.services.repository;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
 import finance.domain.BankAccount;
 import finance.domain.Category;
 import finance.domain.Operation;
 
+@Service
 public class Repository {
     private final Map<Integer, BankAccount> accounts = new HashMap<>();
     private final Map<Integer, Category> categories = new HashMap<>();
@@ -15,8 +19,8 @@ public class Repository {
     public Map<Integer, Category> getAllCategories() { return categories; }
     public Map<Integer, Operation> getAllOperations() { return operations; }
 
-    public void addAccount(BankAccount account) {
-        if (account != null && accounts.containsKey(account.getId())) {
+    protected void addAccount(BankAccount account) {
+        if (account != null && !accounts.containsKey(account.getId())) {
             accounts.put(account.getId(), account);
         }
     }
@@ -29,14 +33,14 @@ public class Repository {
         return accounts.containsKey(accountId);
     }
 
-    public void removeAccount(int accountId) {
+    protected void removeAccount(int accountId) {
         if (accounts.containsKey(accountId)) {
             accounts.remove(accountId);
         }
     }
 
-    public void addCategory(Category category) {
-        if (category != null && categories.containsKey(category.getId())) {
+    protected void addCategory(Category category) {
+        if (category != null && !categories.containsKey(category.getId())) {
             categories.put(category.getId(), category);
         }
     }
@@ -49,14 +53,14 @@ public class Repository {
         return categories.containsKey(categoryId);
     }
 
-    public void removeCategory(int categoryId) {
+    protected void removeCategory(int categoryId) {
         if (categories.containsKey(categoryId)) {
             categories.remove(categoryId);
         }
     }
 
-    public void addOperation(Operation operation) {
-        if (operation != null && operations.containsKey(operation.getId())) {
+    protected void addOperation(Operation operation) {
+        if (operation != null && !operations.containsKey(operation.getId())) {
             operations.put(operation.getId(), operation);
         }
     }
@@ -69,7 +73,7 @@ public class Repository {
         return operations.containsKey(operationId);
     }
 
-    public void removeOperation(int operationId) {
+    protected void removeOperation(int operationId) {
         if (operations.containsKey(operationId)) {
             operations.remove(operationId);
         }
