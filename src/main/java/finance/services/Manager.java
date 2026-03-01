@@ -13,17 +13,14 @@ public class Manager {
     private final Map<ServiceType, Service> services = new HashMap<>();
     private final RepositoryManipulator repositoryManipulator;
     private Action lastAction;
-    private Integer changedItemId;
 
     public Manager(Repository repository, RepositoryManipulator manipulator) {
         this.repositoryManipulator = manipulator;
         this.lastAction = Action.NONE;
-        this.changedItemId = null;
     }
 
     public Map<ServiceType, Service> getAllServices() { return services; }
     public Action getLastAction() { return lastAction; }
-    public Integer getChangedItemId() { return changedItemId; }
 
     public void addService(Service service) {
         if ((service != null) && (!services.containsKey(service.getType()))) {
@@ -44,7 +41,6 @@ public class Manager {
     public void addAccount(BankAccount account) {
         if (repositoryManipulator.addAccount(account)) {
             lastAction = Action.ADD_ACCOUNT;
-            changedItemId = account.getId();
             notifyAllServices();
         }
     }
@@ -52,7 +48,6 @@ public class Manager {
     public void removeAccount(int accountId) {
         if (repositoryManipulator.removeAccount(accountId)) {
             lastAction = Action.REMOVE_ACCOUNT;
-            changedItemId = accountId;
             notifyAllServices();
         }
     }
@@ -60,7 +55,6 @@ public class Manager {
     public void addCategory(Category category) {
         if (repositoryManipulator.addCategory(category)) {
             lastAction = Action.ADD_CATEGORY;
-            changedItemId = category.getId();
             notifyAllServices();
         }
     }
@@ -68,7 +62,6 @@ public class Manager {
     public void removeCategory(int categoryId) {
         if (repositoryManipulator.removeCategory(categoryId)) {
             lastAction = Action.REMOVE_CATEGORY;
-            changedItemId = categoryId;
             notifyAllServices();
         }
     }
@@ -76,7 +69,6 @@ public class Manager {
     public void addOperation(Operation operation) {
         if (repositoryManipulator.addOperation(operation)) {
             lastAction = Action.ADD_OPERATION;
-            changedItemId = operation.getId();
             notifyAllServices();
         }
     }
@@ -84,9 +76,24 @@ public class Manager {
     public void removeOperation(int operationId) {
         if (repositoryManipulator.removeOperation(operationId)) {
             lastAction = Action.REMOVE_OPERATION;
-            changedItemId = operationId;
             notifyAllServices();
         }
+    }
+
+    public AnalyticService getAnalytic() {
+        lastAction = Action.GET_ANALYTIC;
+        if (isActiveService(ServiceType.ANALYTIC)) {
+            return (AnalyticService) services.get(ServiceType.ANALYTIC);
+        }
+        return null;
+    }
+
+    public BankAccountService getBalance() {
+        lastAction = Action.GET_BALANCE;
+        if (isActiveService(ServiceType.BANK_ACCOUNT)) {
+            return (BankAccountService) services.get(ServiceType.BANK_ACCOUNT);
+        }
+        return null;
     }
 
     private void notifyAllServices() {

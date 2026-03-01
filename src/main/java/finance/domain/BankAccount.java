@@ -2,7 +2,7 @@ package finance.domain;
 
 import finance.common.Money;
 
-public class BankAccount {
+public class BankAccount implements FinanceElement {
     private static int nextId = 0;
 
     private final int id;
@@ -18,6 +18,10 @@ public class BankAccount {
     public int getId() { return id; }
     public String getName() { return name; }
     public Money getBalance() { return balance; }
+
+    public FinanceElementType getElementType() {
+        return FinanceElementType.ACCOUNT;
+    }
 
     public void rename(String name) {
         this.name = name;

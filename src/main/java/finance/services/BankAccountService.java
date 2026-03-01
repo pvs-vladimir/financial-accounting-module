@@ -25,9 +25,13 @@ public class BankAccountService extends Service {
         if (!tasks.isEmpty()) {
             if (tasks.contains(BankAccountTask.BALANCE)) {
                 if (manager.getLastAction() == Action.ADD_OPERATION) {
-                    updateBalanceWithOperation(manager.getChangedItemId());
+                    updateBalanceWithOperation(repository.getNewElementId());
                 } else if (manager.getLastAction() == Action.REMOVE_OPERATION) {
-                    reCalculateBalance();
+                    updateBalanceWithoutOperation((Operation) repository.getLastRemovedElement());
+                } else if (manager.getLastAction() == Action.ADD_ACCOUNT) {
+                    updateBalanceWithAccount(repository.getNewElementId());
+                } else if (manager.getLastAction() == Action.REMOVE_ACCOUNT) {
+                    updateBalanceWithoutAccount((BankAccount) repository.getLastRemovedElement());
                 }
             }
         }
@@ -57,6 +61,32 @@ public class BankAccountService extends Service {
             account.withdraw(operation.getAmount());
             totalBalance.subtract(operation.getAmount());
         }
+    }
+
+    private void updateBalanceWithoutOperation(Operation operation) {
+        if (operation == null) return;
+
+        BankAccount account = repository.getAccount(operation.getBankAccountId());
+        if (operation.getType() == OperationType.INCOME) {
+            account.withdraw(operation.getAmount());
+            totalBalance.subtract(operation.getAmount());
+        } else if (operation.getType() == OperationType.EXPENSE) {
+            account.deposit(operation.getAmount());
+            totalBalance.add(operation.getAmount());
+        }
+    }
+
+    private void updateBalanceWithAccount(Integer accountId) {
+        if (accountId == null) return;
+
+        BankAccount account = repository.getAccount(accountId);
+        totalBalance.add(account.getBalance());
+    }
+
+    private void updateBalanceWithoutAccount(BankAccount account) {
+        if (account == null) return;
+
+        totalBalance.subtract(account.getBalance());
     }
 
     private void resetBalance() {

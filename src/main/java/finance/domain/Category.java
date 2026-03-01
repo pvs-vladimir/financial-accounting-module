@@ -1,6 +1,6 @@
 package finance.domain;
 
-public class Category {
+public class Category implements FinanceElement {
     private static int nextId = 0;
 
     private final int id;
@@ -16,4 +16,8 @@ public class Category {
     public int getId() { return id; }
     public CategoryType getType() { return type; }
     public String getName() { return name; }
+
+    public FinanceElementType getElementType() {
+        return FinanceElementType.CATEGORY;
+    }
 }

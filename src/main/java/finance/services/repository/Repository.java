@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import finance.domain.BankAccount;
 import finance.domain.Category;
+import finance.domain.FinanceElement;
 import finance.domain.Operation;
 
 @Service
@@ -15,12 +16,18 @@ public class Repository {
     private final Map<Integer, Category> categories = new HashMap<>();
     private final Map<Integer, Operation> operations = new HashMap<>();
 
+    private Integer newElementId;
+    private FinanceElement lastRemovedElement;
+
     public Map<Integer, BankAccount> getAllAccounts() { return accounts; }
     public Map<Integer, Category> getAllCategories() { return categories; }
     public Map<Integer, Operation> getAllOperations() { return operations; }
+    public Integer getNewElementId() { return newElementId; }
+    public FinanceElement getLastRemovedElement() { return lastRemovedElement; }
 
     protected void addAccount(BankAccount account) {
         if (account != null && !accounts.containsKey(account.getId())) {
+            newElementId = account.getId();
             accounts.put(account.getId(), account);
         }
     }
@@ -35,12 +42,14 @@ public class Repository {
 
     protected void removeAccount(int accountId) {
         if (accounts.containsKey(accountId)) {
+            lastRemovedElement = accounts.get(accountId);
             accounts.remove(accountId);
         }
     }
 
     protected void addCategory(Category category) {
         if (category != null && !categories.containsKey(category.getId())) {
+            newElementId = category.getId();
             categories.put(category.getId(), category);
         }
     }
@@ -55,12 +64,14 @@ public class Repository {
 
     protected void removeCategory(int categoryId) {
         if (categories.containsKey(categoryId)) {
+            lastRemovedElement = categories.get(categoryId);
             categories.remove(categoryId);
         }
     }
 
     protected void addOperation(Operation operation) {
         if (operation != null && !operations.containsKey(operation.getId())) {
+            newElementId = operation.getId();
             operations.put(operation.getId(), operation);
         }
     }
@@ -75,6 +86,7 @@ public class Repository {
 
     protected void removeOperation(int operationId) {
         if (operations.containsKey(operationId)) {
+            lastRemovedElement = operations.get(operationId);
             operations.remove(operationId);
         }
     }

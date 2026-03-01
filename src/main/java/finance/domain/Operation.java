@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import finance.common.Money;
 
-public class Operation {
+public class Operation implements FinanceElement {
     private static int nextId = 0;
 
     private final int id;
@@ -33,6 +33,10 @@ public class Operation {
     public LocalDate getDate() { return date; }
     public String getDescription() { return description; }
     public int getCategoryId() { return categoryId; }
+
+    public FinanceElementType getElementType() {
+        return FinanceElementType.OPERATION;
+    }
 
     public void recategorize(int categoryId) {
         this.categoryId = categoryId;
